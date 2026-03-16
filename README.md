@@ -28,3 +28,6 @@ The project uses the MODMA (Multimodal Open Dataset for Mental Disorder Analysis
 - Improve model accuracy
 - Experiment with deep learning models
 - Deploy the model for practical use
+## Author
+- Srihitha Iytha
+- B.Tech Computer Science Student## Author
