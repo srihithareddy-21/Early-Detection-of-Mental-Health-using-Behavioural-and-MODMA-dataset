@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeuroScreen — User Info</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+<style>
+body { display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--bg); }
+.info-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+.info-container h2 { text-align: center; margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; }
+.form-group input, .form-group select { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+.btn { width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn:hover { background: var(--primary-dark); }
+.error { color: red; text-align: center; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+<div class="info-container">
+<h2>Complete Your Profile</h2>
+<div id="error" class="error" style="display:none;"></div>
+<form id="info-form">
+<div class="form-group">
+<label for="name">Name</label>
+<input type="text" id="name" required>
+</div>
+<div class="form-group">
+<label for="age">Age</label>
+<input type="number" id="age" min="1" max="120" required>
+</div>
+<div class="form-group">
+<label for="gender">Gender</label>
+<select id="gender" required>
+<option value="">Select</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+<option value="Prefer not to say">Prefer not to say</option>
+</select>
+</div>
+<button type="submit" class="btn">Save Profile</button>
+</form>
+</div>
+<script>
+const errorDiv = document.getElementById('error');
+const nameInput = document.getElementById('name');
+const ageInput = document.getElementById('age');
+const genderInput = document.getElementById('gender');
+const token = localStorage.getItem('token');
+
+if (!token) {
+  window.location.href = '/login';
+} else {
+  fetch('/api/user-info', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  }).then(async response => {
+    if (!response.ok) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+      return;
+    }
+    const user = await response.json();
+    if (user.name) nameInput.value = user.name;
+    if (user.age) ageInput.value = user.age;
+    if (user.gender) genderInput.value = user.gender;
+  }).catch(() => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  });
+}
+
+document.getElementById('info-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = nameInput.value;
+  const age = parseInt(ageInput.value);
+  const gender = genderInput.value;
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    window.location.href = '/login';
+    return;
+  }
+
+  errorDiv.style.display = 'none';
+
+  try {
+    const response = await fetch('/api/user-info', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, age, gender })
+    });
+
+    if (response.ok) {
+      window.location.href = '/';
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      errorDiv.textContent = errorData.detail || 'An error occurred';
+      errorDiv.style.display = 'block';
+    }
+  } catch (error) {
+    errorDiv.textContent = error.message || 'An error occurred';
+    errorDiv.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

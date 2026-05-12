@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeuroScreen — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+<style>
+body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f4f5f7; margin: 0; }
+.login-container { background: white; padding: 2.2rem 2.4rem; border-radius: 22px; box-shadow: 0 20px 60px rgba(17, 24, 39, 0.08); width: 100%; max-width: 420px; }
+.login-container h2 { text-align: center; margin-bottom: 1.5rem; font-family: var(--font-display); font-size: 28px; letter-spacing: -0.03em; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; color: #363636; font-weight: 600; }
+.form-group input, .form-group select { width: 100%; padding: 0.95rem 1rem; border: 1px solid #e5e7eb; border-radius: 14px; background: #fafafa; color: #1f2937; font-size: 0.98rem; box-sizing: border-box; }
+.form-group { position: relative; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2d5a3d; background: #fff; box-shadow: 0 0 0 4px rgba(45, 90, 61, 0.08); }
+.password-toggle { position: absolute; top: 50%; right: 1rem; transform: translateY(-50%); background: none; border: none; color: #4b5563; font-size: 0.95rem; cursor: pointer; font-weight: 700; }
+.password-toggle:hover { color: #2d5a3d; }
+.btn { width: 100%; padding: 0.95rem 1rem; background: #2d5a3d; color: white; border: none; border-radius: 14px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease; }
+.btn:hover { background: #1f3f2a; transform: translateY(-1px); box-shadow: 0 12px 30px rgba(45, 90, 61, 0.16); }
+.btn-secondary { width: 100%; margin-top: 0.85rem; background: #fff; color: #2d5a3d; border: 1px solid #d1d5db; }
+.btn-secondary:hover { background: #f7f9f8; }
+.toggle { text-align: center; margin-top: 0.25rem; }
+.profile-section { display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; }
+.profile-section.active { display: block; }
+.profile-section h3 { text-align: center; font-size: 20px; margin-bottom: 1.2rem; color: #1f2937; }
+.profile-section .form-group { margin-bottom: 1.2rem; }
+.notification { position: fixed; top: 20px; right: 20px; max-width: 380px; padding: 14px 16px; border-radius: 12px; background: white; border-left: 4px solid #2d5a3d; box-shadow: 0 4px 12px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; display: flex; align-items: center; gap: 12px; z-index: 9999; }
+.notification-success { border-left-color: #2d5a3d; background: #f0f6f3; }
+.notification-success .notification-icon { color: #2d5a3d; font-weight: bold; }
+.notification-success .notification-text { color: #1a3a25; }
+.notification-error { border-left-color: #c0392b; background: #fef5f5; }
+.notification-error .notification-icon { color: #c0392b; font-weight: bold; }
+.notification-error .notification-text { color: #7a1f16; }
+.notification-text { font-size: 14px; font-weight: 500; }
+.notification-icon { font-size: 18px; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(400px); } to { opacity: 1; transform: translateX(0); } }
+</style>
+</head>
+<body>
+<div class="login-container">
+<h2 id="form-title">Login</h2>
+<form id="auth-form">
+<div class="form-group">
+<label for="username">Username</label>
+<input type="text" id="username" required>
+</div>
+<div class="form-group">
+<label for="password">Password</label>
+<input type="password" id="password" required>
+<button type="button" class="password-toggle" id="password-toggle">Show</button>
+</div>
+<div class="form-group" id="email-group" style="display:none;">
+<label for="email">Email</label>
+<input type="email" id="email">
+</div>
+<button type="submit" class="btn" id="submit-btn">Login</button>
+</form>
+
+<!-- Profile Completion Section (shown after signup) -->
+<div class="profile-section" id="profile-section">
+<h3>Complete Your Profile</h3>
+<form id="profile-form">
+<div class="form-group">
+<label for="name">Full Name</label>
+<input type="text" id="name" required>
+</div>
+<div class="form-group">
+<label for="age">Age</label>
+<input type="number" id="age" min="1" max="120" required>
+</div>
+<div class="form-group">
+<label for="gender">Gender</label>
+<select id="gender" required>
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+<option value="Prefer not to say">Prefer not to say</option>
+</select>
+</div>
+<button type="submit" class="btn">Continue to NeuroScreen</button>
+</form>
+</div>
+
+<div class="toggle">
+<button type="button" class="btn btn-secondary" id="toggle-btn">Don't have an account? Sign up</button>
+</div>
+</div>
+<script>
+// Simple notification function for login page
+function showNotification(message, type = 'success', duration = 4000) {
+  let container = document.getElementById('notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'notification-container';
+    container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';
+    document.body.appendChild(container);
+  }
+
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  notification.innerHTML = `<span class="notification-icon">${icon}</span><span class="notification-text">${message}</span>`;
+  container.appendChild(notification);
+
+  if (duration > 0) {
+    setTimeout(() => {
+      notification.remove();
+    }, duration);
+  }
+
+  return notification;
+}
+
+let isLogin = true;
+let isSigningUp = false;
+const formTitle = document.getElementById('form-title');
+const submitBtn = document.getElementById('submit-btn');
+const toggleBtn = document.getElementById('toggle-btn');
+const emailGroup = document.getElementById('email-group');
+const profileSection = document.getElementById('profile-section');
+const authForm = document.getElementById('auth-form');
+const profileForm = document.getElementById('profile-form');
+
+toggleBtn.addEventListener('click', () => {
+  isLogin = !isLogin;
+  formTitle.textContent = isLogin ? 'Login' : 'Sign Up';
+  submitBtn.textContent = isLogin ? 'Login' : 'Sign Up';
+  toggleBtn.textContent = isLogin ? "Don't have an account? Sign up" : "Already have an account? Login";
+  emailGroup.style.display = isLogin ? 'none' : 'block';
+  profileSection.classList.remove('active');
+  isSigningUp = false;
+});
+
+const passwordInput = document.getElementById('password');
+const passwordToggle = document.getElementById('password-toggle');
+
+passwordToggle.addEventListener('click', () => {
+  const isHidden = passwordInput.type === 'password';
+  passwordInput.type = isHidden ? 'text' : 'password';
+  passwordToggle.textContent = isHidden ? 'Hide' : 'Show';
+});
+
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const email = document.getElementById('email').value.trim();
+
+  if (!username || !password) {
+    showNotification('Please enter both username and password.', 'error');
+    return;
+  }
+
+  if (!isLogin) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailPattern.test(email)) {
+      showNotification('Please enter a valid email address.', 'error');
+      return;
+    }
+  }
+
+  try {
+    const response = await fetch(isLogin ? '/login' : '/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(isLogin ? { username, password } : { username, email, password })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem('token', data.access_token);
+      
+      if (isLogin) {
+        showNotification('Login successful! Redirecting...', 'success', 1500);
+        setTimeout(() => window.location.href = '/', 1500);
+      } else {
+        showNotification('Account created! Complete your profile.', 'success', 1500);
+        isSigningUp = true;
+        authForm.style.display = 'none';
+        toggleBtn.style.display = 'none';
+        profileSection.classList.add('active');
+        document.getElementById('name').focus();
+      }
+    } else {
+      let message = 'An error occurred';
+      try {
+        const errorData = await response.json();
+        if (errorData.detail) {
+          message = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+        }
+      } catch {
+        message = response.statusText || message;
+      }
+      showNotification(message, 'error');
+    }
+  } catch (error) {
+    showNotification(error.message || 'An error occurred', 'error');
+  }
+});
+
+profileForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const age = parseInt(document.getElementById('age').value);
+  const gender = document.getElementById('gender').value;
+  
+  if (!name || !age || !gender) {
+    showNotification('Please fill in all profile fields.', 'error');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showNotification('Session expired. Please try again.', 'error');
+      return;
+    }
+
+    const response = await fetch('/api/user-info', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, age, gender })
+    });
+
+    if (response.ok) {
+      showNotification('Profile updated! Redirecting...', 'success', 1500);
+      setTimeout(() => window.location.href = '/', 1500);
+    } else {
+      let message = 'Failed to update profile';
+      try {
+        const errorData = await response.json();
+        if (errorData.detail) {
+          message = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+        }
+      } catch {
+        message = response.statusText || message;
+      }
+      showNotification(message, 'error');
+    }
+  } catch (error) {
+    showNotification(error.message || 'An error occurred', 'error');
+  }
+});
+</script>
+</body>
+</html>

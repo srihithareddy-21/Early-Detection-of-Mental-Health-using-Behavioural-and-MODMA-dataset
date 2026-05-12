@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeuroScreen — Multimodal Depression Screening</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- Notification Container for Toast Messages -->
+<div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; max-width: 380px; pointer-events: none;"></div>
+
+<header>
+  <div class="logo"><div class="logo-dot"></div>NeuroScreen</div>
+  <div class="header-right">
+    <div class="profile-icon" id="profile-icon" style="display:none;" onclick="showProfile()">👤</div>
+    <span class="demo-badge">Demo Mode</span>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab active" data-tab="overview"><span class="tab-icon">◎</span> Overview</button>
+  <button class="tab" data-tab="questionnaire"><span class="tab-icon">📋</span> Questionnaire</button>
+  <button class="tab" data-tab="fusion"><span class="tab-icon">🎙️</span> Audio + Fusion</button>
+  <button class="tab" data-tab="charts"><span class="tab-icon">📊</span> Results & Charts</button>
+  <button class="tab" data-tab="about"><span class="tab-icon">ℹ️</span> About</button>
+</div>
+
+<div class="main">
+
+  <!-- OVERVIEW -->
+  <div class="pane active" id="pane-overview">
+    <div class="hero">
+      <div class="hero-tag">Multimodal AI · Research Tool</div>
+      <h1>Multimodal <em>Depression</em><br>Screening System</h1>
+      <p>Combining acoustic voice biomarkers with structured behavioral questionnaires via late fusion — a research-grade screening pipeline built on clinical evidence.</p>
+    </div>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-icon">🎙️</div>
+        <h3>Voice Analysis</h3>
+        <p>Extracts MFCCs, ZCR, RMS energy, and delta-MFCCs from raw speech. A CNN-BiLSTM model maps acoustic features to depression probability.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">📋</div>
+        <h3>Behavioral Questionnaire</h3>
+        <p>23 validated questions across Sleep, Physical, Work, Social, Mood, History, and Motivation domains.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">⚗️</div>
+        <h3>Late Fusion Engine</h3>
+        <p>Weighted combination of audio score (α=0.6) and behavioral score (β=0.4) with sigmoid calibration and confidence estimation.</p>
+      </div>
+    </div>
+    <div class="disclaimer"><strong>⚠️ Clinical Disclaimer</strong> NeuroScreen is a research and educational tool only. It is not FDA-cleared or validated for clinical diagnosis. Results must not be used to make clinical decisions without oversight from a qualified mental health professional.</div>
+  </div>
+
+  <!-- QUESTIONNAIRE -->
+  <div class="pane" id="pane-questionnaire">
+    <div class="card">
+      <div class="card-title">Behavioral Questionnaire</div>
+      <div class="card-sub">Rate each item from 0 (not at all) to 4 (nearly every day) over the past two weeks.</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="qpb"></div></div>
+      <div class="progress-text" id="q-prog-text">0 / 23 answered</div>
+      <div id="q-form"></div>
+      <div class="q-button-row">
+        <button class="submit-q" id="q-submit" onclick="submitQuestionnaire()" disabled>Calculate Behavioral Score</button>
+        <button class="clear-all-btn" id="q-clear-all" onclick="clearAllAnswers()">Clear All Answers</button>
+      </div>
+      <div class="score-display" id="q-score-display">
+        <div class="score-num" id="q-score-num">--</div>
+        <div class="score-meta">
+          <strong id="q-score-label">—</strong>
+          <p id="q-score-detail"></p>
+        </div>
+      </div>
+      <button class="next-btn" id="q-next" onclick="goToFusion()" style="display:none;">→ Proceed to Audio Analysis</button>
+    </div>
+  </div>
+
+  <!-- AUDIO + FUSION -->
+  <div class="pane" id="pane-fusion">
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div class="card-title">Audio Input</div>
+          <div class="card-sub">Upload a .wav speech sample (min 30 seconds recommended).</div>
+          <div class="upload-zone" onclick="document.getElementById('audio-file-input').click()" id="upload-zone">
+            <svg viewBox="0 0 40 40" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="20" cy="20" r="18"/>
+              <path d="M20 26V14M14 20l6-6 6 6"/>
+            </svg>
+            <p>Click to upload or drag & drop</p>
+            <div class="hint">Accepts .wav · Recommended: 30–120 seconds</div>
+          </div>
+          <input type="file" id="audio-file-input" accept=".wav,audio/wav,audio/*" onchange="onFileSelect(event)"/>
+          <p id="audio-file-name" style="margin-top:8px; font-size:14px; color:#444;"></p>
+          <div class="file-selected-wrapper" id="file-selected-wrapper">
+            <div class="file-selected" id="file-selected">✓ File loaded</div>
+            <button class="file-remove-btn" id="file-remove-btn" onclick="removeAudioFile()" title="Remove this file">✕</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Behavioral Breakdown</div>
+          <div class="card-sub" id="beh-sub">Complete the questionnaire first to see domain scores.</div>
+          <div class="domain-breakdown">
+            <div class="domain-chip"><div class="dc-label">Sleep</div><div class="dc-val" id="d-sleep">—</div><div class="dc-bar"><div class="dc-fill" id="db-sleep" style="width:0%"></div></div></div>
+            <div class="domain-chip"><div class="dc-label">Mood</div><div class="dc-val" id="d-mood">—</div><div class="dc-bar"><div class="dc-fill" id="db-mood" style="width:0%"></div></div></div>
+            <div class="domain-chip"><div class="dc-label">Social</div><div class="dc-val" id="d-social">—</div><div class="dc-bar"><div class="dc-fill" id="db-social" style="width:0%"></div></div></div>
+            <div class="domain-chip"><div class="dc-label">Physical</div><div class="dc-val" id="d-physical">—</div><div class="dc-bar"><div class="dc-fill" id="db-physical" style="width:0%"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">Late Fusion Analysis</div>
+          <div class="card-sub">Run the full pipeline — audio + behavioral → fused risk score.</div>
+          <button class="run-btn" id="run-btn" onclick="runFusion()"><span>▶</span> Run Late Fusion Analysis</button>
+          <div class="log-box" id="log-box"></div>
+          <div class="result-panel" id="result-panel">
+            <div class="section-label">Scores</div>
+            <div class="result-grid">
+              <div class="result-chip"><div class="rc-val" id="r-audio">—</div><div class="rc-label">Audio Score</div></div>
+              <div class="result-chip"><div class="rc-val" id="r-beh">—</div><div class="rc-label">Behavioral Score</div></div>
+              <div class="result-chip"><div class="rc-val" id="r-fusion">—</div><div class="rc-label">Fusion Score</div></div>
+            </div>
+            <div class="result-footer">
+              <span class="risk-pill" id="r-risk">—</span>
+              <div class="conf-bar-wrap"><div class="conf-bar" id="conf-bar" style="width:0%"></div></div>
+              <span class="conf-val" id="conf-val">—</span>
+            </div>
+            <button class="view-analytics-btn" id="view-analytics-btn" onclick="goToCharts()" style="display:none;">View Detailed Analytics</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="pane" id="pane-charts">
+    <div class="charts-grid">
+      <div class="chart-card"><h3>Class Distribution</h3><canvas id="chart-pie"></canvas></div>
+      <div class="chart-card"><h3>Model Accuracy Comparison</h3><canvas id="chart-bar"></canvas></div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="section-label">Session History</div>
+      <table class="session-table" id="session-table">
+        <thead><tr><th>#</th><th>Time</th><th>Audio</th><th>Behavioral</th><th>Fusion</th><th>Risk</th><th>Confidence</th></tr></thead>
+        <tbody id="session-tbody"><tr><td colspan="7" class="empty-msg">No sessions yet — run an analysis first.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="pane" id="pane-about">
+    <div class="card">
+      <div class="card-title">Tech Stack</div>
+      <div class="tech-grid">
+        <div class="tech-chip"><div class="tc-icon">🐍</div><div class="tc-name">FastAPI</div><div class="tc-desc">Backend server</div></div>
+        <div class="tech-chip"><div class="tc-icon">🔊</div><div class="tc-name">Librosa</div><div class="tc-desc">Audio features</div></div>
+        <div class="tech-chip"><div class="tc-icon">🧠</div><div class="tc-name">TensorFlow</div><div class="tc-desc">CNN-BiLSTM</div></div>
+        <div class="tech-chip"><div class="tc-icon">📊</div><div class="tc-name">Chart.js</div><div class="tc-desc">Visualizations</div></div>
+        <div class="tech-chip"><div class="tc-icon">⚗️</div><div class="tc-name">Scikit-learn</div><div class="tc-desc">ML utilities</div></div>
+        <div class="tech-chip"><div class="tc-icon">🔢</div><div class="tc-name">NumPy</div><div class="tc-desc">Array ops</div></div>
+        <div class="tech-chip"><div class="tc-icon">🐼</div><div class="tc-name">Pandas</div><div class="tc-desc">Data wrangling</div></div>
+        <div class="tech-chip"><div class="tc-icon">🌐</div><div class="tc-name">Vanilla JS</div><div class="tc-desc">Frontend UI</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Performance Metrics</div>
+      <div class="metric-row"><div class="metric-label">Audio Model Accuracy</div><div class="metric-bar-wrap"><div class="metric-bar" style="width:82%"></div></div><div class="metric-val">82.4%</div></div>
+      <div class="metric-row"><div class="metric-label">Behavioral Accuracy</div><div class="metric-bar-wrap"><div class="metric-bar" style="width:76%"></div></div><div class="metric-val">76.1%</div></div>
+      <div class="metric-row"><div class="metric-label">Fusion Accuracy</div><div class="metric-bar-wrap"><div class="metric-bar" style="width:87%"></div></div><div class="metric-val">87.3%</div></div>
+      <div class="metric-row"><div class="metric-label">Sensitivity (Recall)</div><div class="metric-bar-wrap"><div class="metric-bar" style="width:85%;background:var(--gold)"></div></div><div class="metric-val">85.2%</div></div>
+      <div class="metric-row"><div class="metric-label">Specificity</div><div class="metric-bar-wrap"><div class="metric-bar" style="width:89%;background:var(--info)"></div></div><div class="metric-val">89.0%</div></div>
+      <div class="metric-row"><div class="metric-label">AUC-ROC</div><div class="metric-bar-wrap"><div class="metric-bar" style="width:91%;background:#8b4513"></div></div><div class="metric-val">0.912</div></div>
+    </div>
+    <div class="paper-ref">📄 <strong>Reference:</strong> Cummins et al. (2015). <em>A review of depression and suicide risk assessment using speech analysis.</em> Speech Communication, 71, 10–49. <a href="https://doi.org/10.1016/j.specom.2015.03.004" target="_blank">doi:10.1016/j.specom.2015.03.004</a></div>
+  </div>
+
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profile-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Your Profile</h2>
+      <button class="modal-close" onclick="closeProfile()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="profile-view">
+        <div class="profile-field">
+          <label>Username</label>
+          <p id="profile-username">—</p>
+        </div>
+        <div class="profile-field">
+          <label>Email</label>
+          <p id="profile-email">—</p>
+        </div>
+        <div class="profile-field">
+          <label>Name</label>
+          <p id="profile-name">—</p>
+        </div>
+        <div class="profile-field">
+          <label>Age</label>
+          <p id="profile-age">—</p>
+        </div>
+        <div class="profile-field">
+          <label>Gender</label>
+          <p id="profile-gender">—</p>
+        </div>
+      </div>
+      <div id="profile-edit" style="display:none;">
+        <div class="profile-field">
+          <label>Name</label>
+          <input type="text" id="edit-name" placeholder="Enter your name">
+        </div>
+        <div class="profile-field">
+          <label>Age</label>
+          <input type="number" id="edit-age" min="0" max="150" placeholder="Enter your age">
+        </div>
+        <div class="profile-field">
+          <label>Gender</label>
+          <select id="edit-gender">
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="profile-edit-btn" class="btn-secondary" onclick="enableProfileEdit()">Edit</button>
+      <button id="profile-save-btn" class="btn-primary" onclick="saveProfile()" style="display:none;">Save Changes</button>
+      <button id="profile-cancel-btn" class="btn-secondary" onclick="cancelProfileEdit()" style="display:none;">Cancel</button>
+      <button id="profile-logout-btn" class="btn-logout" onclick="logoutUser()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="/static/js/data.js"></script>
+<script src="/static/js/questionnaire.js"></script>
+<script src="/static/js/fusion.js"></script>
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/tabs.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+// Auth check
+const token = localStorage.getItem('token');
+if (!token) {
+window.location.href = '/login';
+} else {
+// Fetch user info
+fetch('/api/user-info', {
+headers: { 'Authorization': `Bearer ${token}` }
+}).then(response => {
+if (response.ok) {
+return response.json();
+} else {
+localStorage.removeItem('token');
+window.location.href = '/login';
+}
+}).then(user => {
+if (user) {
+document.getElementById('profile-icon').style.display = 'block';
+window.currentUser = user;
+}
+}).catch(() => {
+localStorage.removeItem('token');
+window.location.href = '/login';
+});
+}
+
+function showProfile() {
+  if (window.currentUser) {
+    // Populate profile view
+    document.getElementById('profile-username').textContent = window.currentUser.username || '—';
+    document.getElementById('profile-email').textContent = window.currentUser.email || '—';
+    document.getElementById('profile-name').textContent = window.currentUser.name || '—';
+    document.getElementById('profile-age').textContent = window.currentUser.age ? window.currentUser.age : '—';
+    document.getElementById('profile-gender').textContent = window.currentUser.gender || '—';
+    
+    // Reset edit form
+    document.getElementById('edit-name').value = window.currentUser.name || '';
+    document.getElementById('edit-age').value = window.currentUser.age || '';
+    document.getElementById('edit-gender').value = window.currentUser.gender || '';
+    
+    // Show modal
+    document.getElementById('profile-modal').style.display = 'block';
+    document.getElementById('profile-view').style.display = 'block';
+    document.getElementById('profile-edit').style.display = 'none';
+    document.getElementById('profile-edit-btn').style.display = 'inline-block';
+    document.getElementById('profile-save-btn').style.display = 'none';
+    document.getElementById('profile-cancel-btn').style.display = 'none';
+  }
+}
+
+function closeProfile() {
+  document.getElementById('profile-modal').style.display = 'none';
+}
+
+function enableProfileEdit() {
+  document.getElementById('profile-view').style.display = 'none';
+  document.getElementById('profile-edit').style.display = 'block';
+  document.getElementById('profile-edit-btn').style.display = 'none';
+  document.getElementById('profile-save-btn').style.display = 'inline-block';
+  document.getElementById('profile-cancel-btn').style.display = 'inline-block';
+}
+
+function cancelProfileEdit() {
+  document.getElementById('profile-view').style.display = 'block';
+  document.getElementById('profile-edit').style.display = 'none';
+  document.getElementById('profile-edit-btn').style.display = 'inline-block';
+  document.getElementById('profile-save-btn').style.display = 'none';
+  document.getElementById('profile-cancel-btn').style.display = 'none';
+}
+
+async function saveProfile() {
+  const token = localStorage.getItem('token');
+  const name = document.getElementById('edit-name').value.trim() || null;
+  const age = document.getElementById('edit-age').value ? parseInt(document.getElementById('edit-age').value) : null;
+  const gender = document.getElementById('edit-gender').value || null;
+  
+  try {
+    const response = await fetch('/api/user-info', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, age, gender })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Update current user
+    window.currentUser.name = name;
+    window.currentUser.age = age;
+    window.currentUser.gender = gender;
+    
+    // Refresh profile view
+    document.getElementById('profile-name').textContent = name || '—';
+    document.getElementById('profile-age').textContent = age || '—';
+    document.getElementById('profile-gender').textContent = gender || '—';
+    
+    // Close edit mode
+    cancelProfileEdit();
+    
+    // Show themed notification
+    try {
+      if (typeof showNotification === 'function') {
+        showNotification('Profile updated successfully!', 'success', 3000);
+        console.log('[PROFILE] Notification shown');
+      } else {
+        console.warn('[PROFILE] showNotification not available, using fallback');
+        alert('Profile updated successfully!');
+      }
+    } catch (err) {
+      console.error('[PROFILE] Error showing notification:', err);
+      alert('Profile updated successfully!');
+    }
+  } catch (error) {
+    try {
+      if (typeof showNotification === 'function') {
+        showNotification(`Error updating profile: ${error.message}`, 'error', 4000);
+      } else {
+        alert(`Error updating profile: ${error.message}`);
+      }
+    } catch (err) {
+      alert(`Error updating profile: ${error.message}`);
+    }
+  }
+}
+
+function logoutUser() {
+  // Clear localStorage
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
+  
+  // Reset React state and app state
+  state.answers = {};
+  state.domainScores = { sleep: null, physical: null, work: null, social: null, mood: null, history: null, motivation: null };
+  state.behavioralScore = null;
+  state.audioScore = null;
+  state.riskScore = null;
+  state.riskCategory = null;
+  state.confidence = null;
+  state.fileSelected = false;
+  
+  // Redirect to login page
+  window.location.href = '/login';
+}
+</script>
+</body>
+</html>

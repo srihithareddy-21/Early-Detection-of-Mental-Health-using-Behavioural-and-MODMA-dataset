@@ -1,0 +1,201 @@
+{
+  "users": [
+    {
+      "username": "xyz",
+      "email": "xyz@gmail.com",
+      "hashed_password": "$2b$12$uOKdRIwlv.6ueiImxj.ed.8GYe31puVeMkOpVS8zBt8BxAbGyHqGq",
+      "name": "octopus",
+      "age": 34,
+      "gender": "Male",
+      "history": [
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T15:38:38.508Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.5105,
+          "fusion_score": 0.4562,
+          "risk": "Moderate Risk",
+          "confidence": 0.6613,
+          "timestamp": "2026-04-22T16:42:49.876Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T17:05:47.606Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T17:06:03.096Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T17:06:04.856Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T17:06:21.025Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T17:14:44.566Z"
+        },
+        {
+          "audio_score": 0.42,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.252,
+          "risk": "Low Risk",
+          "confidence": 0.9472,
+          "timestamp": "2026-04-22T17:15:05.403Z"
+        },
+        {
+          "audio_score": 0.0,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.0,
+          "risk": "Low Risk",
+          "confidence": 0.95,
+          "timestamp": "2026-04-22T17:50:14.925Z"
+        },
+        {
+          "audio_score": 0.0,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.0,
+          "risk": "Low Risk",
+          "confidence": 0.95,
+          "timestamp": "2026-04-22T17:50:48.607Z"
+        },
+        {
+          "audio_score": 0.0,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.0,
+          "risk": "Low Risk",
+          "confidence": 0.95,
+          "timestamp": "2026-04-22T17:52:05.193Z"
+        },
+        {
+          "audio_score": 0.0,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.0,
+          "risk": "Low Risk",
+          "confidence": 0.95,
+          "timestamp": "2026-04-22T17:52:19.265Z"
+        },
+        {
+          "audio_score": 0.5958,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.3575,
+          "risk": "Low Risk",
+          "confidence": 0.7995,
+          "timestamp": "2026-04-22T17:59:46.682Z"
+        },
+        {
+          "audio_score": 0.5717,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.343,
+          "risk": "Low Risk",
+          "confidence": 0.8198,
+          "timestamp": "2026-04-22T18:00:05.750Z"
+        },
+        {
+          "audio_score": 0.5958,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.3575,
+          "risk": "Low Risk",
+          "confidence": 0.7995,
+          "timestamp": "2026-04-22T18:00:37.651Z"
+        },
+        {
+          "audio_score": 0.5175,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.3105,
+          "risk": "Low Risk",
+          "confidence": 0.8653,
+          "timestamp": "2026-04-22T18:00:50.334Z"
+        },
+        {
+          "audio_score": 0.5958,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.3575,
+          "risk": "Low Risk",
+          "confidence": 0.7995,
+          "timestamp": "2026-04-22T18:28:23.293Z"
+        },
+        {
+          "audio_score": 0.5958,
+          "behavioral_score": 0.0,
+          "fusion_score": 0.3575,
+          "risk": "Low Risk",
+          "confidence": 0.7995,
+          "timestamp": "2026-04-22T18:32:11.248Z"
+        },
+        {
+          "audio_score": 0.5717,
+          "behavioral_score": 0.6433,
+          "fusion_score": 0.6003,
+          "risk": "Moderate Risk",
+          "confidence": 0.7405,
+          "timestamp": "2026-04-22T18:33:54.529Z"
+        }
+      ]
+    },
+    {
+      "username": "Prasanna",
+      "email": "abc@gmail.com",
+      "hashed_password": "$2b$12$PA09e1qeZQazeJ8T1VEg.e9XOojGBwlWP4exjCsbuC1/znyWbUyg6",
+      "name": "Prasanna",
+      "age": 19,
+      "gender": "Female",
+      "history": [
+        {
+          "audio_score": 0.73,
+          "behavioral_score": 0.601,
+          "fusion_score": 0.6784,
+          "risk": "High Risk",
+          "confidence": 0.8497,
+          "timestamp": "2026-05-12T07:19:34.671Z"
+        },
+        {
+          "audio_score": 0.74,
+          "behavioral_score": 0.6114,
+          "fusion_score": 0.6886,
+          "risk": "High Risk",
+          "confidence": 0.864,
+          "timestamp": "2026-05-12T07:21:00.353Z"
+        },
+        {
+          "audio_score": 0.78,
+          "behavioral_score": 0.6114,
+          "fusion_score": 0.7126,
+          "risk": "High Risk",
+          "confidence": 0.8976,
+          "timestamp": "2026-05-12T07:21:13.634Z"
+        }
+      ]
+    }
+  ],
+  "updated": "2026-05-12T07:21:13.635350"
+}
